@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-k8s-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-k8s-demo
+  template:
+    metadata:
+      labels:
+        app: python-k8s-demo
+    spec:
+      containers:
+      - name: python-k8s-demo
+        image: 192.168.40.185/library/pythonweb:latest
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+      imagePullSecrets:
+      - name: regcred
+
+
+
