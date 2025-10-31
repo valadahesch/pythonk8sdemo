@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络与安全设备资产管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #6a8cff 0%, #4b6cb7 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        h1 {
+            font-size: 24px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        h1 i {
+            margin-right: 10px;
+            font-size: 26px;
+        }
+        
+        .table-container {
+            padding: 20px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+        
+        th {
+            background-color: #f1f5fd;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 500;
+            color: #4a5568;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+        
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        
+        .action-btn {
+            background-color: #6a8cff;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-right: 5px;
+            transition: background-color 0.2s;
+        }
+        
+        .action-btn:hover {
+            background-color: #5a7ce6;
+        }
+        
+        .evaluation-btn {
+            background-color: #48bb78;
+        }
+        
+        .evaluation-btn:hover {
+            background-color: #38a169;
+        }
+        
+        .add-btn-container {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .add-btn {
+            background-color: #6a8cff;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(106, 140, 255, 0.3);
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .add-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(106, 140, 255, 0.4);
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: modalFade 0.3s;
+        }
+        
+        @keyframes modalFade {
+            from {opacity: 0; transform: translateY(-20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #a0aec0;
+            cursor: pointer;
+        }
+        
+        .close-btn:hover {
+            color: #4a5568;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4a5568;
+            font-size: 14px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #6a8cff;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+        
+        .radio-option input {
+            margin-right: 5px;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #6a8cff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #5a7ce6;
+        }
+        
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #cbd5e0;
+        }
+        
+        .auto-generated {
+            background-color: #f7fafc;
+            color: #a0aec0;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            header {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i>📊</i> 网络与安全设备资产管理系统</h1>
+        </header>
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>序号</th>
+                        <th>设备名称</th>
+                        <th>主机地址</th>
+                        <th>硬件型号</th>
+                        <th>软件版本</th>
+                        <th>虚拟化设备</th>
+                        <th>域名</th>
+                        <th>设备类型</th>
+                        <th>操作</th>
+                        <th>测评记录</th>
+                    </tr>
+                </thead>
+                <tbody id="assetTableBody">
+                    <!-- 数据将通过JavaScript动态添加 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="add-btn-container">
+            <button class="add-btn" id="addAssetBtn">+</button>
+        </div>
+    </div>
+    
+    <!-- 添加/编辑资产模态框 -->
+    <div class="modal" id="assetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加设备资产</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="assetForm">
+                    <div class="form-group">
+                        <label for="serialNumber">序号</label>
+                        <input type="text" id="serialNumber" class="form-control auto-generated" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="deviceName">设备名称</label>
+                        <input type="text" id="deviceName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hostAddress">主机地址</label>
+                        <input type="text" id="hostAddress" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="hardwareModel">硬件型号</label>
+                        <input type="text" id="hardwareModel" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="softwareVersion">软件版本</label>
+                        <input type="text" id="softwareVersion" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>虚拟化设备</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="virtualYes" name="virtualization" value="是">
+                                <label for="virtualYes">是</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="virtualNo" name="virtualization" value="否" checked>
+                                <label for="virtualNo">否</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="domain">域名</label>
+                        <input type="text" id="domain" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="deviceType">设备类型</label>
+                        <select id="deviceType" class="form-control" required>
+                            <option value="">请选择设备类型</option>
+                            <option value="防火墙">防火墙</option>
+                            <option value="核心交换机">核心交换机</option>
+                            <option value="网闸">网闸</option>
+                            <option value="日志审计">日志审计</option>
+                            <option value="堡垒机">堡垒机</option>
+                            <option value="态势感知">态势感知</option>
+                            <option value="WAF">WAF</option>
+                            <option value="终端安全">终端安全</option>
+                            <option value="准入控制">准入控制</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelBtn">取消</button>
+                <button class="btn btn-primary" id="saveBtn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 示例数据
+        let assets = [
+            {
+                id: 1,
+                deviceName: "主防火墙",
+                hostAddress: "192.168.1.1",
+                hardwareModel: "FortiGate 600E",
+                softwareVersion: "v6.4.5",
+                virtualization: "否",
+                domain: "fw.company.com",
+                deviceType: "防火墙"
+            },
+            {
+                id: 2,
+                deviceName: "核心交换机",
+                hostAddress: "192.168.1.2",
+                hardwareModel: "Cisco Catalyst 9500",
+                softwareVersion: "IOS-XE 17.06",
+                virtualization: "否",
+                domain: "switch.company.com",
+                deviceType: "核心交换机"
+            },
+            {
+                id: 3,
+                deviceName: "Web应用防火墙",
+                hostAddress: "192.168.1.10",
+                hardwareModel: "F5 BIG-IP",
+                softwareVersion: "v15.1",
+                virtualization: "是",
+                domain: "waf.company.com",
+                deviceType: "WAF"
+            }
+        ];
+
+        // DOM元素
+        const assetTableBody = document.getElementById('assetTableBody');
+        const addAssetBtn = document.getElementById('addAssetBtn');
+        const assetModal = document.getElementById('assetModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const assetForm = document.getElementById('assetForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const serialNumberInput = document.getElementById('serialNumber');
+
+        // 当前编辑的资产ID（null表示添加新资产）
+        let currentEditId = null;
+
+        // 初始化表格
+        function renderTable() {
+            assetTableBody.innerHTML = '';
+            
+            assets.forEach(asset => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${asset.id}</td>
+                    <td>${asset.deviceName}</td>
+                    <td>${asset.hostAddress}</td>
+                    <td>${asset.hardwareModel}</td>
+                    <td>${asset.softwareVersion}</td>
+                    <td>${asset.virtualization}</td>
+                    <td>${asset.domain}</td>
+                    <td>${asset.deviceType}</td>
+                    <td>
+                        <button class="action-btn edit-btn" data-id="${asset.id}">编辑</button>
+                    </td>
+                    <td>
+                        <button class="action-btn evaluation-btn" data-id="${asset.id}">测评记录</button>
+                    </td>
+                `;
+                assetTableBody.appendChild(row);
+            });
+            
+            // 添加编辑按钮事件
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    editAsset(id);
+                });
+            });
+            
+            // 添加测评记录按钮事件
+            document.querySelectorAll('.evaluation-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.getAttribute('data-id'));
+                    // 在实际应用中，这里应该跳转到测评记录页面
+                    alert(`将跳转到设备ID为 ${id} 的测评记录页面`);
+                    // window.location.href = `evaluation.html?id=${id}`;
+                });
+            });
+        }
+
+        // 打开添加资产模态框
+        function openAddModal() {
+            currentEditId = null;
+            modalTitle.textContent = '添加设备资产';
+            assetForm.reset();
+            serialNumberInput.value = assets.length + 1;
+            assetModal.style.display = 'flex';
+        }
+
+        // 打开编辑资产模态框
+        function editAsset(id) {
+            currentEditId = id;
+            const asset = assets.find(a => a.id === id);
+            
+            if (asset) {
+                modalTitle.textContent = '编辑设备资产';
+                document.getElementById('deviceName').value = asset.deviceName;
+                document.getElementById('hostAddress').value = asset.hostAddress;
+                document.getElementById('hardwareModel').value = asset.hardwareModel;
+                document.getElementById('softwareVersion').value = asset.softwareVersion;
+                document.getElementById('domain').value = asset.domain;
+                document.getElementById('deviceType').value = asset.deviceType;
+                
+                // 设置虚拟化设备选项
+                if (asset.virtualization === '是') {
+                    document.getElementById('virtualYes').checked = true;
+                } else {
+                    document.getElementById('virtualNo').checked = true;
+                }
+                
+                serialNumberInput.value = asset.id;
+                assetModal.style.display = 'flex';
+            }
+        }
+
+        // 保存资产
+        function saveAsset() {
+            const deviceName = document.getElementById('deviceName').value;
+            const hostAddress = document.getElementById('hostAddress').value;
+            const hardwareModel = document.getElementById('hardwareModel').value;
+            const softwareVersion = document.getElementById('softwareVersion').value;
+            const domain = document.getElementById('domain').value;
+            const deviceType = document.getElementById('deviceType').value;
+            const virtualization = document.querySelector('input[name="virtualization"]:checked').value;
+            
+            // 简单验证
+            if (!deviceName || !hostAddress || !hardwareModel || !softwareVersion || !deviceType) {
+                alert('请填写所有必填字段');
+                return;
+            }
+            
+            if (currentEditId === null) {
+                // 添加新资产
+                const newId = assets.length + 1;
+                assets.push({
+                    id: newId,
+                    deviceName,
+                    hostAddress,
+                    hardwareModel,
+                    softwareVersion,
+                    virtualization,
+                    domain,
+                    deviceType
+                });
+            } else {
+                // 更新现有资产
+                const assetIndex = assets.findIndex(a => a.id === currentEditId);
+                if (assetIndex !== -1) {
+                    assets[assetIndex] = {
+                        id: currentEditId,
+                        deviceName,
+                        hostAddress,
+                        hardwareModel,
+                        softwareVersion,
+                        virtualization,
+                        domain,
+                        deviceType
+                    };
+                }
+            }
+            
+            // 关闭模态框并刷新表格
+            assetModal.style.display = 'none';
+            renderTable();
+        }
+
+        // 事件监听
+        addAssetBtn.addEventListener('click', openAddModal);
+        
+        closeModalBtn.addEventListener('click', function() {
+            assetModal.style.display = 'none';
+        });
+        
+        cancelBtn.addEventListener('click', function() {
+            assetModal.style.display = 'none';
+        });
+        
+        saveBtn.addEventListener('click', saveAsset);
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(event) {
+            if (event.target === assetModal) {
+                assetModal.style.display = 'none';
+            }
+        });
+
+        // 初始化
+        renderTable();
+    </script>
+</body>
+</html>
